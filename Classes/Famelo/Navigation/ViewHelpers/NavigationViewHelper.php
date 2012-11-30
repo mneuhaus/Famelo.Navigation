@@ -123,7 +123,7 @@ class NavigationViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelp
 		}
 
 		uasort($nested, function($a, $b){
-			return $a->offsetGet('sorting') > $b->offsetGet('sotring');
+			return $a->offsetGet('sorting') > $b->offsetGet('sorting');
 		});
 
 		return $nested;

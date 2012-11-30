@@ -47,7 +47,7 @@ class NavigationItem {
 		$this->container['children'][] = $child;
 
 		uasort($this->container['children'], function($a, $b){
-			return $a->offsetGet('sorting') > $b->offsetGet('sotring');
+			return $a->offsetGet('sorting') > $b->offsetGet('sorting');
 		});
 	}
 
