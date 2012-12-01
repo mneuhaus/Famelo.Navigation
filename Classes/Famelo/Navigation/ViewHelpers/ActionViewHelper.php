@@ -58,7 +58,7 @@ class ActionViewHelper extends \TYPO3\Fluid\ViewHelpers\Link\ActionViewHelper {
 		if (is_array($actionConfiguration) && count($actionConfiguration)) {
 			extract($actionConfiguration);
 		}
-		if ($actionConfiguration instanceof \ArrayAccess) {
+		if (is_object($actionConfiguration)) {
 			extract($actionConfiguration->getArray());
 		}
 		$uriBuilder = $this->controllerContext->getUriBuilder();
