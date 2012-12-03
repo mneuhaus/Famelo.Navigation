@@ -19,10 +19,22 @@ use TYPO3\Flow\Annotations as Flow;
  */
 class NavigationViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	/**
-	 * @Flow\Inject
 	 * @var \TYPO3\Flow\Configuration\ConfigurationManager
+	 * @Flow\Inject
 	 */
 	protected $configurationManager;
+
+	/**
+	 * @var \TYPO3\Flow\Cache\CacheManager
+	 * @Flow\Inject
+	 */
+	protected $cacheManager;
+
+	/**
+	 * @var \Community\CacheExtensions\Services\CacheIdentityService
+	 * @Flow\Inject
+	 */
+	protected $cacheIdentityService;
 
 	/**
 	 * The AccessDecisionVoterManager
@@ -47,19 +59,24 @@ class NavigationViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelp
 	 * @return string
 	 */
 	public function render($path = NULL, $as = 'items', $nested = TRUE) {
-		$routes = $this->configurationManager->getConfiguration(\TYPO3\Flow\Configuration\ConfigurationManager::CONFIGURATION_TYPE_ROUTES);
+		$cache = $this->cacheManager->getCache('Famelo_Navigation_ViewHelpers_NavigationViewHelper');
+		$cacheIdentifier = 'NavigationViewHelper-' . $this->cacheIdentityService->getIdentifierForUserRoles();
+		if (!$cache->has($cacheIdentifier)) {
+			$routes = $this->configurationManager->getConfiguration(\TYPO3\Flow\Configuration\ConfigurationManager::CONFIGURATION_TYPE_ROUTES);
 
-		$items = $this->parseRoutes($routes);
+			$items = $this->parseRoutes($routes);
 
-		if ($nested || TRUE) {
-			$items = $this->nest($items);
+			if ($nested || TRUE) {
+				$items = $this->nest($items);
+			}
+
+			$this->templateVariableContainer->add($as, $items);
+			$output = $this->renderChildren();
+			$this->templateVariableContainer->remove($as);
+
+			$cache->set($cacheIdentifier, $output);
 		}
-
-		$this->templateVariableContainer->add($as, $items);
-		$output = $this->renderChildren();
-		$this->templateVariableContainer->remove($as);
-
-		return $output;
+		return $cache->get($cacheIdentifier);
 	}
 
 	public function parseRoutes($routes) {
