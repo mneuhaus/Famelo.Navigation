@@ -61,6 +61,9 @@ class ActionViewHelper extends \TYPO3\Fluid\ViewHelpers\Link\ActionViewHelper {
 		if (is_object($actionConfiguration)) {
 			extract($actionConfiguration->getArray());
 		}
+		if (empty($action)) {
+			$action = 'index';
+		}
 		$uriBuilder = $this->controllerContext->getUriBuilder();
 		try {
 			$uri = $uriBuilder
