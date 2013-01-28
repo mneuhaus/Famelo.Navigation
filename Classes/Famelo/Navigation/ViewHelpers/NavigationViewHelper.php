@@ -41,6 +41,11 @@ class NavigationViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelp
 	protected $policyService;
 
 	/**
+	 * @var \Famelo\Features\FeatureService
+	 */
+	protected $featureService;
+
+	/**
 	 * @param string $path
 	 * @param string $as
 	 * @param boolean $nested
@@ -48,6 +53,10 @@ class NavigationViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelp
 	 */
 	public function render($path = NULL, $as = 'items', $nested = TRUE) {
 		$routes = $this->configurationManager->getConfiguration(\TYPO3\Flow\Configuration\ConfigurationManager::CONFIGURATION_TYPE_ROUTES);
+
+		if (class_exists('\Famelo\Features\FeatureService')) {
+			$this->featureService = new \Famelo\Features\FeatureService();
+		}
 
 		$items = $this->parseRoutes($routes);
 
@@ -84,6 +93,12 @@ class NavigationViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelp
 					$vote = $this->accessDecisionVoterManager->decideOnJoinPoint($joinPoint);
 				} catch (\TYPO3\Flow\Security\Exception\AccessDeniedException $e) {
 					continue;
+				}
+
+				if ($this->featureService !== NULL && isset($route['feature'])) {
+					if ($this->featureService->isFeatureActive($route['feature']) === FALSE) {
+						continue;
+					}
 				}
 
 				$items[] = $item;
