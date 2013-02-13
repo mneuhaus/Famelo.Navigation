@@ -86,13 +86,15 @@ class NavigationViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelp
 				}
 
 				$className = str_replace(array_keys($searchAndReplace), array_values($searchAndReplace), $classTemplate);
-				try {
-					$joinPoint = new \Famelo\Navigation\Aop\VirtualJoinPoint();
-					$joinPoint->setClassName($className);
-					$joinPoint->setMethodName($route['defaults']['@action'] . 'Action');
-					$vote = $this->accessDecisionVoterManager->decideOnJoinPoint($joinPoint);
-				} catch (\TYPO3\Flow\Security\Exception\AccessDeniedException $e) {
-					continue;
+				if ($this->policyService->hasPolicyEntryForMethod($className, $route['defaults']['@action'] . 'Action')) {
+					try {
+						$joinPoint = new \Famelo\Navigation\Aop\VirtualJoinPoint();
+						$joinPoint->setClassName($className);
+						$joinPoint->setMethodName($route['defaults']['@action'] . 'Action');
+						$vote = $this->accessDecisionVoterManager->decideOnJoinPoint($joinPoint);
+					} catch (\TYPO3\Flow\Security\Exception\AccessDeniedException $e) {
+						continue;
+					}
 				}
 
 				if ($this->featureService !== NULL && isset($route['feature'])) {
