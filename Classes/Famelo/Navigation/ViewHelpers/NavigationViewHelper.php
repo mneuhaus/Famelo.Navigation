@@ -82,6 +82,9 @@ class NavigationViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelp
 				$searchAndReplace = array();
 				foreach ($route['defaults'] as $key => $value) {
 					$item[ltrim($key, '@')] = $value;
+					if (is_array($value)) {
+						continue;
+					}
 					$searchAndReplace['{' . ltrim($key, '@') . '}'] = str_replace('.', '\\', $value);
 				}
 
